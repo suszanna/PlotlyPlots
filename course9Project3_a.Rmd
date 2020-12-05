@@ -1,0 +1,154 @@
+---
+title: "course9Project3"
+author: "suszanna"
+date: "12/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Comparison of Interactive 3D surface, line and contour plots using Plotly
+
+Assignment: Create a web page presentation using R Markdown that features interactive plots created with Plotly.
+
+This presentation features a comparison of interactive maps created using Plotly: 3D surface, line plots & contour. Data used was shared from the web. Parameters used were derived for different effects.  Each plot consists of variations in line, direction and surface.  This is meant to be a brief intro to Plotly features and capabilities.
+
+##### Load Data
+
+```{r}
+library(ggplot2)
+library(plotly)
+library(dplyr)
+data("presidents")
+data("volcano")
+```
+#### 3D plots with variations in line, direction and surface
+
+### 1 Surface type plot
+
+```{r}
+### 1 Surface
+# aplot:  'surface plot in 3D- single surface'
+aplot <- plot_ly(z=volcano, type="surface")
+aplot
+```
+
+### 2 Scatter3D against 3d-line data
+
+```{r}
+### 2-scatter3D
+# bplot: 'scatter3D plot in lines mode'
+# get csv of 3d-line data for 3d line plots
+data <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/3d-line1.csv')
+
+names(data)
+dim(data)
+str(data)
+
+data$color <- as.factor(data$color)
+
+bplot <- plot_ly(data, x = ~x, y = ~y, z = ~z, type = 'scatter3d', mode = 'line',
+        opacity = 7, 
+        line = list(width = 6, color = ~color, colorscale = 'Viridis', reverscale = FALSE)
+        )
+
+bplot
+```
+
+### 3 Scatter3D in lines and markers mode
+
+```{r}
+
+### 3-scatter3D 
+# dplot: 'scatter3D plot in lines and markers mode'
+# use a 4D data frame
+x <- c()
+y <- c()
+z <- c()
+c <- c()
+
+for (i in 1:60) {
+  r <- 20 * cos(i / 30)
+  x <- c(x, r * cos(i))
+  y <- c(y, r * sin(i))
+  z <- c(z, i)
+  c <- c(c, i)
+}
+
+data <- data.frame(x, y, z, c)
+
+dplot <- plot_ly(data, x = ~x, y = ~y, z = ~z, type = 'scatter3d', mode = 'lines+markers',
+        line = list(width = 5, color = ~c, colorscale = 'Viridis'),
+        marker = list(size = 4.5, color = ~c, colorscale = 'Greens', cmin = -20, cmax = 100))
+
+dplot
+```
+
+### 4 Multiple surface type plot
+
+```{r}
+
+### 4-multiple surface
+# dplot: 'surface plot in 3D with multiple surfaces'
+# create custom data frame
+z <- c(
+  c(8.83,8.89,8.81,8.87,8.9,8.87),
+  c(8.89,8.94,8.85,8.94,8.96,8.92),
+  c(8.84,8.9,8.82,8.92,8.93,8.91),
+  c(8.79,8.85,8.79,8.9,8.94,8.92),
+  c(8.79,8.88,8.81,8.9,8.95,8.92),
+  c(8.8,8.82,8.78,8.91,8.94,8.92),
+  c(8.75,8.78,8.77,8.91,8.95,8.92),
+  c(8.8,8.8,8.77,8.91,8.95,8.94),
+  c(8.74,8.81,8.76,8.93,8.98,8.99),
+  c(8.89,8.99,8.92,9.1,9.13,9.11),
+  c(8.97,8.97,8.91,9.09,9.11,9.11),
+  c(9.04,9.08,9.05,9.25,9.28,9.27),
+  c(9,9.01,9,9.2,9.23,9.2),
+  c(8.99,8.99,8.98,9.18,9.2,9.19),
+  c(8.93,8.97,8.97,9.18,9.2,9.18)
+)
+dim(z) <- c(15,6)
+z2 <- z + .79
+z3 <- z - .59
+
+
+#c <- plot_ly(type = 'scatter3d')
+c <- plot_ly(type = 'surface', colorscale = 'Viridis')
+c <- c %>% add_surface(z = ~z, opacity = 0.95)
+c <- c %>% add_surface(z = ~z2, opacity = 0.90)
+c <- c %>% add_surface(z = ~z3, opacity = 0.85)
+
+dplot <- c
+dplot
+```
+
+### 5 Contour map with volcano data
+
+```{r}
+### 5- contour with elevation in meters
+# eplot: 'contour plot'
+# use volcano data shared on the web
+
+eplot <- plot_ly(z = volcano, type = "contour", contours = list(showlabels = TRUE))
+eplot <- eplot %>% colorbar(title = "Elevation \n in meters")
+
+eplot
+```
+
+##### notes
+
+```{r}
+#plot_ly(plotly) #initiate a plotly visualization
+# This function maps R objects to plotly.js, an (MIT licensed) web-based interactive charting library. It provides abstractions for doing common things (e.g. mapping data values to fill colors (via color) or creating animations (via frame)) and sets some different defaults to make the interface feel more 'R-like' (i.e., closer to plot() and ggplot2::qplot()).
+# usage:  plot_ly(data.frame(), ... type = NULL)
+# dataframe:  (optional)
+#type:  A character string specifying the trace type (e.g. "scatter", "bar", "box", etc). If specified, it always creates a trace, otherwise
+
+
+
+```
+
+Note that the `echo = FALSE` parameter may be added to a code chunk to prevent printing of the R code that generated the plot.
